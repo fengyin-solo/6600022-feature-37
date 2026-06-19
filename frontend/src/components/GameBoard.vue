@@ -115,6 +115,7 @@ function render() {
 function handleClick(e: MouseEvent) {
   if (store.status !== 'playing') return;
   if (store.aiConfig.enabled && store.currentPlayer === store.aiConfig.playerColor) return;
+  if (store.isAiThinking) return;
 
   const canvas = canvasRef.value;
   if (!canvas) return;
@@ -128,10 +129,11 @@ function handleClick(e: MouseEvent) {
 
   if (row < 0 || row >= BOARD_SIZE || col < 0 || col >= BOARD_SIZE) return;
 
-  const placed = store.placeStone(row, col);
-  if (placed && store.aiConfig.enabled && !store.isGameOver) {
-    setTimeout(() => store.aiMove(), 200);
-  }
+  store.makeMove(row, col).then(placed => {
+    if (placed && store.aiConfig.enabled && !store.isGameOver) {
+      setTimeout(() => store.aiMove(), 200);
+    }
+  });
 }
 
 onMounted(() => render());

@@ -16,6 +16,21 @@
         <!-- Game Status -->
         <div class="bg-gray-900 rounded-xl p-4 border border-gray-700">
           <h3 class="text-lg font-bold text-green-400 mb-3">游戏状态</h3>
+
+          <ErrorAlert
+            v-if="store.createGameError"
+            :error="store.createGameError"
+            :dismissible="true"
+            @dismiss="store.clearCreateGameError()"
+          />
+
+          <ErrorAlert
+            v-if="store.aiMoveError"
+            :error="store.aiMoveError"
+            :dismissible="true"
+            @dismiss="store.clearAiMoveError()"
+          />
+
           <div class="space-y-2 text-sm">
             <div class="flex justify-between">
               <span class="text-gray-400">状态</span>
@@ -45,9 +60,11 @@
           <div class="mt-4 flex gap-2">
             <button
               @click="store.startGame()"
-              class="flex-1 py-2 bg-green-600 hover:bg-green-500 text-white rounded-lg transition-colors text-sm font-medium"
+              :disabled="store.isCreatingGame"
+              class="flex-1 py-2 bg-green-600 hover:bg-green-500 disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded-lg transition-colors text-sm font-medium flex items-center justify-center gap-2"
             >
-              {{ store.status === 'playing' ? '重新开始' : '开始游戏' }}
+              <svg v-if="store.isCreatingGame" class="animate-spin h-4 w-4" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+              {{ store.isCreatingGame ? '创建中...' : (store.status === 'playing' ? '重新开始' : '开始游戏') }}
             </button>
           </div>
         </div>
@@ -120,6 +137,7 @@ import { computed } from 'vue';
 import { useGameStore } from './store/game';
 import GameBoard from './components/GameBoard.vue';
 import ReplayPanel from './components/ReplayPanel.vue';
+import ErrorAlert from './components/ErrorAlert.vue';
 
 const store = useGameStore();
 
